@@ -12,8 +12,8 @@ export const AirlineProvider = ({ children }) => {
   const loadAirlines = async () => {
     try {
       setLoading(true);
-      const data = await airlineApi.getAll();
-      setAirlines(data);
+      const response = await airlineApi.getAll();
+      setAirlines(response.data || response);
     } catch (error) {
       setError("Error al cargar aerolíneas");
       console.error(error);
@@ -25,7 +25,8 @@ export const AirlineProvider = ({ children }) => {
   const createAirline = async (airlineData) => {
     try {
       setLoading(true);
-      const newAirline = await airlineApi.create(airlineData);
+      const response = await airlineApi.create(airlineData);
+      const newAirline = response.data?.airline || response.airline;
       setAirlines((prev) => [...prev, newAirline]);
       return newAirline;
     } catch (error) {
@@ -40,7 +41,7 @@ export const AirlineProvider = ({ children }) => {
     try {
       setLoading(true);
       await airlineApi.delete(id);
-      setAirlines((prev) => prev.filter((airline) => airline.id !== id));
+      setAirlines((prev) => prev.filter((airline) => airline._id !== id));
     } catch (error) {
       setError("Error al eliminar aerolínea");
       throw error;
@@ -52,9 +53,10 @@ export const AirlineProvider = ({ children }) => {
   const updateAirline = async (id, airlineData) => {
     try {
       setLoading(true);
-      const updatedAirline = await airlineApi.update(id, airlineData);
+      const response = await airlineApi.update(id, airlineData);
+      const updatedAirline = response.data?.airline || response.airline;
       setAirlines((prev) =>
-        prev.map((airline) => (airline.id === id ? updatedAirline : airline))
+        prev.map((airline) => (airline._id === id ? updatedAirline : airline))
       );
       return updatedAirline;
     } catch (error) {
@@ -65,13 +67,20 @@ export const AirlineProvider = ({ children }) => {
     }
   };
 
-  const searchAirlines = (query) => {
+  const searchAirlines = async (query) => {
     if (!query) return airlines; // Retorna todas las aerolíneas si no hay consulta
-    return airlines.filter(
-      (airline) =>
-        airline.nombre.toLowerCase().includes(query.toLowerCase()) ||
-        airline.pais_origen.toLowerCase().includes(query.toLowerCase())
-    );
+    try {
+      const response = await airlineApi.search(query);
+      return response.data || response;
+    } catch (error) {
+      setError("Error en la búsqueda");
+      return airlines.filter(
+      airline =>
+        airline.name.toLowerCase().includes(query.toLowerCase()) ||
+        airline.country_of_origin.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+    
   };
 
   useEffect(() => {

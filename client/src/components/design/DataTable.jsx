@@ -3,12 +3,14 @@ import DeleteButton from "./DeleteButton";
 import UpdateButton from "./UpdateButton";
 
 export default function DataTable({ data, onDelete, onEdit, idField, successModal, setSuccessModal }) {
-  if (!data || data.length === 0) {
-    return <p>No hay datos para mostrar.</p>;
-  }
+  const filterHeaders = (data) => {
+    if (!data || data.length === 0) return [];
+    const excludeFields = ["_id", "createdAt", "updatedAt", "__v"]; // Campos a excluir
+    return Object.keys(data[0]).filter((key) => !excludeFields.includes(key));
+  };
 
   console.log(data);
-  const headers = Object.keys(data[0]);
+  const headers = filterHeaders(data);
 
   return (
     <div className="overflow-x-auto scrollbar-none h-[31rem]">

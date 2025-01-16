@@ -23,7 +23,7 @@ export const airlineApi = {
   },
 
   search: async () => {
-    const response = await axios.get(`/airlines/`);
+    const response = await axios.get(`/airlines/?search=${query}`);
     return response.data;
   }
 };

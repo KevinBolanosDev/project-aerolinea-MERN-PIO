@@ -12,10 +12,10 @@ export default function AirlineFormPage({}) {
     updateAirline,
     loading,
     error,
-    airlines: initialAirlines,
+    airlines,
     searchAirlines,
   } = useAirlines();
-  const [airlines, setAirlines] = useState(initialAirlines); // Estado local para controlar los datos
+  // const [airlines, setAirlines] = useState(""); // Estado local para controlar los datos
   const [editingAirline, setEditingAirline] = useState(null); // Estado para editar
   const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
   const [searchResults, setSearchResults] = useState([]); // Estado para almacenar resultados de búsqueda
@@ -30,23 +30,27 @@ export default function AirlineFormPage({}) {
 
   const FormSubmit = async (data) => {
     try {
+      const transformedData = {
+        ...data,
+        number_of_employees: parseInt(data.number_of_employees, 10), // Convertir a número
+        number_of_airplanes: parseInt(data.number_of_airplanes, 10), // Convertir a número
+        name: data.name.trim(), // Eliminar espacios extra
+        legal_name: data.legal_name.trim(),
+        country_of_origin: data.country_of_origin.trim(),
+        main_office: data.main_office.trim(),
+        phone: data.phone.trim(),
+        email: data.email.trim(),
+        state: data.state.trim(),
+      };
+
       if (editingAirline) {
         // Si editamos, se actualiza
-        const response = await updateAirline(editingAirline.id_aerolinea, data);
-        const update = response.data;
-        setAirlines((prev) =>
-          prev.map((airline) =>
-            airline.id_aerolinea === editingAirline.id_aerolinea
-              ? update
-              : airline
-          )
-        );
-        setEditingAirline(null);
+        const updatedAirline = await updateAirline(editingAirline._id, transformedData);
+        if (updatedAirline) {
+          setEditingAirline(null)
+        }
       } else {
-        // pasamos a crear nuevo registro
-        const response = await createAirline(data);
-        const newAirline = response.data;
-        setAirlines((prev) => [...prev, newAirline]);
+        await createAirline(transformedData);
       }
       reset(); // limpiamos formulario
     } catch (error) {
@@ -59,7 +63,6 @@ export default function AirlineFormPage({}) {
 
     try {
       await deleteAirline(id); // Elimina del servidor
-      setAirlines((prev) => prev.filter((item) => item.id_aerolinea !== id)); // Elimina localmente
     } catch (error) {
       console.error("Error al eliminar la aerolínea:", error);
     }
@@ -67,17 +70,20 @@ export default function AirlineFormPage({}) {
 
   const handleEdit = (item) => {
     setEditingAirline(item);
-    // establecemos lo valores del form
     Object.keys(item).forEach((key) => {
-      if (key in item) {
+      if (key !== '_id' && key !== 'createdAt' && key !== 'updatedAt' && key !== '__v') {
         setValue(key, item[key]);
       }
     });
   };
 
   // Función para manejar la búsqueda
-  const handleSearch = (term) => {
-    const results = searchAirlines(term); // Llama a la función del contexto
+  const handleSearch = async (term) => {
+    if (!term.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    const results = await searchAirlines(term); // Llama a la función del contexto
     setSearchResults(results); // Actualiza el estado con los resultados
   };
 
@@ -90,12 +96,12 @@ export default function AirlineFormPage({}) {
         {error && <div className="text-red-500">{error}</div>}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-4 text-[1.1rem] font-medium text-gray-400">
           <div>
-            <label htmlFor="nombre" className="block mb-1">
+            <label htmlFor="name" className="block mb-1">
               Nombre Aerolinea
             </label>
             <input
               type="text"
-              {...register("nombre", {
+              {...register("name", {
                 minLength: {
                   value: 5,
                   message: "Deber tener minimo 5 caracteres",
@@ -115,17 +121,17 @@ export default function AirlineFormPage({}) {
               })}
               className="w-full border px-2 py-1"
             />
-            {errors.nombre && (
-              <span className="text-red-500">{errors.nombre.message}</span>
+            {errors.name && (
+              <span className="text-red-500">{errors.name.message}</span>
             )}
           </div>
           <div>
-            <label htmlFor="nombre_legal" className="block mb-1">
+            <label htmlFor="legal_name" className="block mb-1">
               Nombre Legal
             </label>
             <input
               type="text"
-              {...register("nombre_legal", {
+              {...register("legal_name", {
                 required: "El nombre legal de la aerolinea es obligatorio",
                 maxLength: {
                   value: 50,
@@ -142,18 +148,18 @@ export default function AirlineFormPage({}) {
               })}
               className="w-full border px-2 py-1"
             />
-            {errors.nombre_legal && (
+            {errors.legal_name && (
               <span className="text-red-500">
-                {errors.nombre_legal.message}
+                {errors.legal_name.message}
               </span>
             )}
           </div>
           <div>
-            <label htmlFor="estado" className="block mb-1">
+            <label htmlFor="state" className="block mb-1">
               Estado Aerolinea
             </label>
             <select
-              {...register("estado", {
+              {...register("state", {
                 required: "Debes seleccionar una opción",
               })}
               className="w-full border  px-2 py-1"
@@ -163,17 +169,17 @@ export default function AirlineFormPage({}) {
               <option value="suspendida">Suspendida</option>
               <option value="inactiva">Inactiva</option>
             </select>
-            {errors.estado && (
-              <span className="text-red-500">{errors.estado.message}</span>
+            {errors.state && (
+              <span className="text-red-500">{errors.state.message}</span>
             )}
           </div>
           <div>
-            <label htmlFor="pais_origen" className="block mb-1">
+            <label htmlFor="country_of_origin" className="block mb-1">
               País Origen
             </label>
             <input
               type="text"
-              {...register("pais_origen", {
+              {...register("country_of_origin", {
                 required: {
                   value: "true",
                   message: "País es requerido",
@@ -194,17 +200,17 @@ export default function AirlineFormPage({}) {
               })}
               className="w-full border  px-2 py-1"
             />
-            {errors.pais_origen && (
-              <span className="text-red-500">{errors.pais_origen.message}</span>
+            {errors.country_of_origin && (
+              <span className="text-red-500">{errors.country_of_origin.message}</span>
             )}
           </div>
           <div>
-            <label htmlFor="numero_empleados" className="block mb-1">
+            <label htmlFor="number_of_employees" className="block mb-1">
               Número de empleados
             </label>
             <input
               type="number"
-              {...register("numero_empleados", {
+              {...register("number_of_employees", {
                 required: {
                   value: "true",
                   message: "Ingrese un valor númerico",
@@ -212,19 +218,19 @@ export default function AirlineFormPage({}) {
               })}
               className="w-full border  px-2 py-1"
             />
-            {errors.numero_empleados && (
+            {errors.number_of_employees && (
               <span className="text-red-500">
-                {errors.numero_empleados.message}
+                {errors.number_of_employees.message}
               </span>
             )}
           </div>
           <div>
-            <label htmlFor="sede_principal" className="block mb-1">
+            <label htmlFor="main_office" className="block mb-1">
               Sede Principal
             </label>
             <input
               type="text"
-              {...register("sede_principal", {
+              {...register("main_office", {
                 required: {
                   value: "true",
                   message: "Sede principal es obligatorio",
@@ -245,19 +251,19 @@ export default function AirlineFormPage({}) {
               })}
               className="w-full border  px-2 py-1"
             />
-            {errors.sede_principal && (
+            {errors.main_office && (
               <span className="text-red-500">
-                {errors.sede_principal.message}
+                {errors.main_office.message}
               </span>
             )}
           </div>
           <div>
-            <label htmlFor="telefono" className="block mb-1">
+            <label htmlFor="phone" className="block mb-1">
               Telefono
             </label>
             <input
               type="tel"
-              {...register("telefono", {
+              {...register("phone", {
                 required: {
                   value: true,
                   message: "Télefono es obligatorio",
@@ -269,8 +275,8 @@ export default function AirlineFormPage({}) {
               })}
               className="w-full border  px-2 py-1"
             />
-            {errors.telefono && (
-              <span className="text-red-500">{errors.telefono.message}</span>
+            {errors.phone && (
+              <span className="text-red-500">{errors.phone.message}</span>
             )}
           </div>
           <div>
@@ -296,12 +302,12 @@ export default function AirlineFormPage({}) {
             )}
           </div>
           <div>
-            <label htmlFor="cantidad_aviones" className="block mb-1">
+            <label htmlFor="number_of_airplanes" className="block mb-1">
               Cantidad de aviones
             </label>
             <input
               type="number"
-              {...register("cantidad_aviones", {
+              {...register("number_of_airplanes", {
                 required: {
                   value: true,
                   message: "Ingrese la cantidad",
@@ -309,9 +315,9 @@ export default function AirlineFormPage({}) {
               })}
               className="w-full border  px-2 py-1"
             />
-            {errors.cantidad_aviones && (
+            {errors.number_of_airplanes && (
               <span className="text-red-500">
-                {errors.cantidad_aviones.message}
+                {errors.number_of_airplanes.message}
               </span>
             )}
           </div>
@@ -348,7 +354,7 @@ export default function AirlineFormPage({}) {
 
       <div className="mx-auto mt-10 sm:w-full">
         <DataTable
-          data={filteredAirlines} // Usa los resultados filtrados
+          data={searchTerm ? searchResults : airlines}
           idField={"_id"}
           onDelete={handleDelete}
           onEdit={handleEdit}
