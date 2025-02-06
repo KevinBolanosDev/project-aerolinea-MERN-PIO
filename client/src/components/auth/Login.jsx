@@ -25,7 +25,7 @@ export default function LoginPage() {
   return (
     <div className="flex items-center justify-center">
       <div className='w-full h-screen pt-10 xl:pt-14 bg-slate-900'>
-    <h2 className='text-3xl w-80 sm:w-[40rem] xl:w-full sm:text-4xl text-center mx-auto'>Gestión de Bases de Datos Aerolinea</h2>
+    <h2 className='text-3xl w-80 sm:w-[40rem] xl:w-full sm:text-4xl text-center mx-auto'></h2>
       <div className="pt-10 mx-auto w-full sm:w-[30rem] rounded-md">
         {/* Manejo de errores del backend */}
         {Array.isArray(loginErrors) && loginErrors.map((error, i) => (

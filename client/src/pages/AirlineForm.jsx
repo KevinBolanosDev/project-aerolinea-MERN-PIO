@@ -45,9 +45,12 @@ export default function AirlineFormPage({}) {
 
       if (editingAirline) {
         // Si editamos, se actualiza
-        const updatedAirline = await updateAirline(editingAirline._id, transformedData);
+        const updatedAirline = await updateAirline(
+          editingAirline._id,
+          transformedData
+        );
         if (updatedAirline) {
-          setEditingAirline(null)
+          setEditingAirline(null);
         }
       } else {
         await createAirline(transformedData);
@@ -71,7 +74,12 @@ export default function AirlineFormPage({}) {
   const handleEdit = (item) => {
     setEditingAirline(item);
     Object.keys(item).forEach((key) => {
-      if (key !== '_id' && key !== 'createdAt' && key !== 'updatedAt' && key !== '__v') {
+      if (
+        key !== "_id" &&
+        key !== "createdAt" &&
+        key !== "updatedAt" &&
+        key !== "__v"
+      ) {
         setValue(key, item[key]);
       }
     });
@@ -149,9 +157,7 @@ export default function AirlineFormPage({}) {
               className="w-full border px-2 py-1"
             />
             {errors.legal_name && (
-              <span className="text-red-500">
-                {errors.legal_name.message}
-              </span>
+              <span className="text-red-500">{errors.legal_name.message}</span>
             )}
           </div>
           <div>
@@ -201,7 +207,9 @@ export default function AirlineFormPage({}) {
               className="w-full border  px-2 py-1"
             />
             {errors.country_of_origin && (
-              <span className="text-red-500">{errors.country_of_origin.message}</span>
+              <span className="text-red-500">
+                {errors.country_of_origin.message}
+              </span>
             )}
           </div>
           <div>
@@ -252,9 +260,7 @@ export default function AirlineFormPage({}) {
               className="w-full border  px-2 py-1"
             />
             {errors.main_office && (
-              <span className="text-red-500">
-                {errors.main_office.message}
-              </span>
+              <span className="text-red-500">{errors.main_office.message}</span>
             )}
           </div>
           <div>
@@ -354,8 +360,19 @@ export default function AirlineFormPage({}) {
 
       <div className="mx-auto mt-10 sm:w-full">
         <DataTable
-          data={searchTerm ? searchResults : airlines}
-          idField={"_id"}
+          data={airlines}
+          headers={[
+            { key: "name", label: "Nombre" },
+            { key: "legal_name", label: "Nombre Legal" },
+            { key: "country_of_origin", label: "País de Origen" },
+            { key: "state", label: "Estado" },
+            { key: "number_of_employees", label: "Empleados" },
+            { key: "main_office", label: "Sede Principal" },
+            { key: "phone", label: "Teléfono" },
+            { key: "email", label: "Correo" },
+            { key: "number_of_airplanes", label: "Aviones" },
+          ]}
+          idField="_id"
           onDelete={handleDelete}
           onEdit={handleEdit}
         />

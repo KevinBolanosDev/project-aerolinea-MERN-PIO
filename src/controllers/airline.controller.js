@@ -80,15 +80,15 @@ export const updateAirline = async (req, res) => {
 // Eliminar una aerolínea
 export const deleteAirline = async (req, res) => {
   try {
-    const deletedAirline = await Airline.findByIdAndDelete(req.params.id);
+    const deleteAirline = await Airline.findByIdAndDelete(req.params.id);
 
-    if (!deletedAirline) {
+    if (!deleteAirline) {
       return res.status(404).json({ message: "Aerolínea no encontrada" });
     }
 
     res.json({
       message: "Aerolínea eliminada exitosamente",
-      airline: deletedAirline,
+      airline: deleteAirline,
     });
   } catch (error) {
     return handleError(res, error, "Error al eliminar la aerolínea");
@@ -121,7 +121,11 @@ export const changeAirlineStatus = async (req, res) => {
       airline: updatedAirline,
     });
   } catch (error) {
-    return handleError(res, error, "Error al actualizar el status de la aerolínea");
+    return handleError(
+      res,
+      error,
+      "Error al actualizar el status de la aerolínea"
+    );
   }
 };
 
@@ -131,7 +135,11 @@ export const searchAirlineByName = async (req, res) => {
     const { name } = req.query;
 
     if (!name) {
-      return res.status(400).json({ message: "El nombre es obligatorio para buscar" });
+      return res
+        .status(400)
+        .json({
+          message: "El nombre de la aerolínea es obligatorio para la busqueda",
+        });
     }
 
     const airlines = await Airline.find({
@@ -140,6 +148,6 @@ export const searchAirlineByName = async (req, res) => {
 
     res.json(airlines);
   } catch (error) {
-    return handleError(res, error, "Error al buscar aerolíneas por nombre");
+    return handleError(res, error, "No se encontrarón resultados");
   }
 };

@@ -24,6 +24,10 @@ form {
   @apply w-[65%] mx-auto;
 }
 
+body {
+  @apply bg-slate-900;
+}
+
 input, select {
   @apply rounded-md;
 }

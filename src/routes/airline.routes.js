@@ -9,7 +9,6 @@ import {
   searchAirlineByName,
 } from "../controllers/airline.controller.js";
 import { validateSchema } from "../middlewares/validator.middleware.js";
-import { authRequired } from "../middlewares/validateToken.js";
 import airlineSchema from "../schemas/airline.schema.js";
 
 const router = Router();

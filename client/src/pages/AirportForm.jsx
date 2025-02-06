@@ -1,37 +1,73 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useAirport } from "../context/AirportContext";
 import DataTable from "../components/design/DataTable";
 
-export default function AirportForm({}) {
-  const { createAirport, loading, error, airport } = useAirport();
-  const [activeTab, setActiveTab] = useState(""); // Estado de menu pestaña activa/inactiva
+export default function AirportForm() {
+  const {
+    createAirport,
+    updateAirport,
+    deleteAirport,
+    searchAirport,
+    airport,
+    loading,
+    error,
+  } = useAirport();
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [editingAirport, setEditingAirport] = useState(null);
 
   const {
     register,
     handleSubmit,
+    setValue,
+    reset,
     formState: { errors },
   } = useForm();
 
-  const FormSubmit = async (data) => {
-    try {
-      await createAirport(data);
-    } catch (error) {
-      console.error("Error en el formulario:", error);
+  useEffect(() => {
+    if (editingAirport) {
+      Object.keys(editingAirport).forEach((key) => setValue(key, editingAirport[key]));
+    } else {
+      reset();
     }
+  }, [editingAirport, setValue, reset]);
+
+  const onSubmit = async (data) => {
+    if (editingAirport) {
+      await updateAirport(editingAirport._id, data);
+      setEditingAirport(null);
+    } else {
+      await createAirport(data);
+    }
+    reset();
+  };
+
+  const handleEdit = (airport) => {
+    setEditingAirport(airport);
+  };
+
+  const handleDelete = async (id) => {
+    await deleteAirport(id);
+    setEditingAirport(null);
+  };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    searchAirport(e.target.value);
   };
 
   return (
     <>
-    <form onSubmit={handleSubmit(FormSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {error && <div className="text-red-500">{error}</div>}
       <div>
-        <label htmlFor="nombre" className="block mb-1">
+        <label htmlFor="name" className="block mb-1">
           Nombre del Aeropuerto
         </label>
         <input
           type="text"
-          {...register("nombre", {
+          {...register("name", {
             minLength: {
               value: 5,
               message: "Debe tener minimo 5 caracteres",
@@ -51,17 +87,17 @@ export default function AirportForm({}) {
           })}
           className="w-full border rounded px-2 py-1"
         />
-        {errors.nombre && (
-          <span className="text-red-500">{errors.nombre.message}</span>
+        {errors.name && (
+          <span className="text-red-500">{errors.name.message}</span>
         )}
       </div>
       <div>
-        <label htmlFor="ciudad" className="block mb-1">
+        <label htmlFor="city" className="block mb-1">
           Ciudad
         </label>
         <input
           type="text"
-          {...register("ciudad", {
+          {...register("city", {
             required: {
               value: true,
               message: "El nombre de la ciudad es requerido",
@@ -78,17 +114,17 @@ export default function AirportForm({}) {
           })}
           className="w-full border rounded px-2 py-1"
         />
-        {errors.ciudad && (
-          <span className="text-red-500">{errors.ciudad.message}</span>
+        {errors.city && (
+          <span className="text-red-500">{errors.city.message}</span>
         )}
       </div>
       <div>
-        <label htmlFor="pais" className="block mb-1">
+        <label htmlFor="country" className="block mb-1">
           Pais
         </label>
         <input
           type="text"
-          {...register("pais", {
+          {...register("country", {
             required: {
               value: true,
               message: "El nombre del pais es requerido",
@@ -104,17 +140,17 @@ export default function AirportForm({}) {
           })}
           className="w-full border rounded px-2 py-1"
         />
-        {errors.pais && (
-          <span className="text-red-500">{errors.pais.message}</span>
+        {errors.country && (
+          <span className="text-red-500">{errors.country.message}</span>
         )}
       </div>
       <div>
-        <label htmlFor="codigo_iata" className="block mb-1">
+        <label htmlFor="iata_code" className="block mb-1">
           Codigo IATA
         </label>
         <input
           type="text"
-          {...register("codigo_iata", {
+          {...register("iata_code", {
             required: {
               value: true,
               message: "El codigo IATA es requerido",
@@ -130,17 +166,17 @@ export default function AirportForm({}) {
           })}
           className="w-full border rounded px-2 py-1"
         />
-        {errors.codigo_iata && (
-          <span className="text-red-500">{errors.codigo_iata.message}</span>
+        {errors.iata_code && (
+          <span className="text-red-500">{errors.iata_code.message}</span>
         )}
       </div>
       <div>
-        <label htmlFor="estado" className="block mb-1">
-          Estado
+        <label htmlFor="gates" className="block mb-1">
+          Puerta de embarque
         </label>
         <input
           type="text"
-          {...register("estado", {
+          {...register("gates", {
             required: {
               value: true,
               message: "El estado es requerido",
@@ -156,23 +192,56 @@ export default function AirportForm({}) {
           })}
           className="w-full border rounded px-2 py-1"
         />
-        {errors.estado && (
-          <span className="text-red-500">{errors.estado.message}</span>
+        {errors.gates && (
+          <span className="text-red-500">{errors.gates.message}</span>
         )}
       </div>
+      <div>
+        <label htmlFor="state" className="block mb-1">
+          Estado
+        </label>
+        <input
+          type="text"
+          {...register("state", {
+            required: {
+              value: true,
+              message: "El estado es requerido",
+            },
+            maxLength: {
+              value: 30,
+              message: "El estado no puede exceder los 30 caracteres",
+            },
+            pattern: {
+              value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
+              message: "Solo se permiten letras y espacios",
+            },
+          })}
+          className="w-full border rounded px-2 py-1"
+        />
+        {errors.state && (
+          <span className="text-red-500">{errors.state.message}</span>
+        )}
+      </div>
+
       <button
         type="submit"
         className="bg-blue-500 text-white px-4 py-2 rounded"
       >
-        {loading ? "Guardando..." : "Agregar Aeropeurto"}
+        {loading ? "Guardando..." : editingAirport ? "Actualizar Aeropuerto" : "Agregar Aeropuerto"}
       </button>
-      <h2 className="text-2xl font-bold mb-2">
-        Datos de {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
-      </h2>
     </form>
-      <div>
-      <DataTable data={airport} />
+
+    <div className="mt-4">
+        <input
+          type="text"
+          placeholder="Buscar aeropuerto..."
+          value={searchTerm}
+          onChange={handleSearch}
+          className="border rounded px-2 py-1 w-full"
+        />
       </div>
+
+      <DataTable data={airport} idField={"_id"} onEdit={handleEdit} onDelete={handleDelete} />
     </>
   );
 }

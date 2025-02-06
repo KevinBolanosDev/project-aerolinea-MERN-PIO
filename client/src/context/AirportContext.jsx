@@ -12,8 +12,8 @@ export const AirportProvider = ({ children }) => {
   const loadAirport = async () => {
     try {
       setLoading(true);
-      const data = await airportApi.getAll();
-      setAirport(data);
+      const response = await airportApi.getAll();
+      setAirport(response.data || response);
     } catch (error) {
       setError('Error al cargar aeropuertos');
       console.error(error);

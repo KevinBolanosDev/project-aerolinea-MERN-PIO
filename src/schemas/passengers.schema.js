@@ -1,52 +1,49 @@
-const { z } = require("zod");
+import { z } from "zod";
 
 const passengerSchema = z.object({
-  name: z.string({
-    required_error: "El nombre es obligatorio",
+  name: z
+    .string({ required_error: "El nombre es obligatorio" })
+    .min(2, "Mínimo 2 caracteres")
+    .max(50, "Máximo 50 caracteres"),
+
+  middle_name: z.string().optional(),
+
+  last_name: z
+    .string({ required_error: "El apellido es obligatorio" })
+    .min(2, "Mínimo 2 caracteres")
+    .max(50, "Máximo 50 caracteres"),
+
+  second_last_name: z.string().optional(),
+
+  document_type: z.enum(["DNI", "Pasaporte", "Cédula"], {
+    required_error: "Tipo de documento es obligatorio",
   }),
-  middle_name: z.string(),
-  last_name: z.string({
-    required_error: "El apellido es obligatorio",
+
+  document_number: z
+    .string({ required_error: "Número de documento obligatorio" }),
+
+  date_of_birth: z.coerce.date({
+    required_error: "Fecha de nacimiento obligatoria",
+    invalid_type_error: "Formato inválido (YYYY-MM-DD)",
   }),
-  second_last_name: z.string(),
-  document_type: z
-    .string({
-      required_error: "Tipo de documento es obligatorio",
-    }),
-  document_number: z.string({
-    required_error: "numero de documento es obligatorio",
+
+  nationality: z.string({ required_error: "La nacionalidad es obligatoria" }),
+
+  gender: z.enum(["masculino", "femenino", "otro"], {
+    required_error: "El género es obligatorio",
   }),
-  date_of_birth: z.date({
-    required_error: "La fecha de nacimiento es obligatorio"
-  }),
-  nationality: z
-    .string({
-      required_error: "La nacionalidad es obligatoria",
-    }),
-  gender: z
-    .enum({
-        masculino,
-        femenino,
-        otro
-    }),
-  country: z.string({
-    required_error: "País es obligatorio",
-  }),
-  city: z.string({
-    required_error: "Ciudad es obligatorio",
-  }),
-  number_phone: z.number({
-    required_error: "Debe agregar un telefono obligatorio",
-  }),
+
+  country: z.string({ required_error: "País es obligatorio" }),
+
+  city: z.string({ required_error: "Ciudad es obligatoria" }),
+
+  phone_number: z
+    .string()
+    .regex(/^\+(?:[0-9]●?){6,14}[0-9]$/, "Formato: +[código][número]"),
+
   email: z
-    .string({
-      required_error: "Correo electronico es obligatorio",
-    })
-    .email({
-      message: "Correo no es valido",
-    }),
+    .string({ required_error: "Correo electrónico es obligatorio" })
+    .email("Correo no es válido"),
 });
 
-module.exports = {
-  passengerSchema,
-};
+export default passengerSchema;

@@ -18,7 +18,7 @@ export const airportApi = {
   },
 
   delete: async (id) => {
-    const response = await axios.delete(`/airport/${id}`);
+    const response = await axios.delete(`/airport/${id  }`);
     return response.data;
   }
 }; 
