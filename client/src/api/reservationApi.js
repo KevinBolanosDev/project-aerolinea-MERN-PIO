@@ -70,7 +70,12 @@ export const reservationApi = {
   // Descargar reserva
   download: async (id) => {
     try {
-      const response = await axios.get(`/reservation/${id}/pdf`);
+      const response = await axios.get(`/reservation/${id}/pdf`, {
+        responseType: "arraybuffer",
+        headers: {
+          Accept: "application/pdf",
+        }
+      });
       return response.data;
     } catch (error) {
       console.error('Error al descargar la reserva:', error.message);

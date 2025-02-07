@@ -41,10 +41,10 @@ export default function RenderForm({ addDataTable, activeTab }){
             onSubmit={(data) => addDataTable("mantenimiento", data)}
           />
         );
-      case "pasajeros":
+/*       case "pasajeros":
         return (
           <PassengerForm onSubmit={(data) => addDataTable("pasajeros", data)} />
-        );
+        ); */
       case "avión":
         return (
           <AirplaneFormPage onSubmit={(data) => addDataTable("avion", data)} />

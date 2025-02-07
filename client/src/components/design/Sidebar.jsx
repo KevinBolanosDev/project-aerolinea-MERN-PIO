@@ -1,8 +1,8 @@
 import React from 'react';
 
 const menuTables = [
-  'aerolinea', 'aeropuerto', 'empleados', 'tarifa', 'vuelo',
-  'tripulación de vuelo', 'mantenimiento', 'pasajeros', 'avión', 'reservas'
+  'aerolinea', 'aeropuerto', 'empleados', 'vuelo',
+  'tripulación de vuelo', 'mantenimiento', 'avión', 'reservas'
 ];
 
 // Se exportan también las props para el sidebar dinamico

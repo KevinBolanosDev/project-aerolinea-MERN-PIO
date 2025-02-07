@@ -106,11 +106,17 @@ export default function ReservationForm({}) {
 const handleDownloadPDF = async (reservationId) => {
   try {
     const pdfBuffer = await downloadPDF(reservationId);
-    const blob = new Blob([pdfBuffer], { type: "application/pdf" });
+    
+    // Crear Blob
+    const blob = new Blob([new Uint8Array(pdfBuffer)], 
+          { type: "application/pdf"   
+       });
+    // Crear enlace y simular clic
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
     link.setAttribute("download", `reserva-${reservationId}.pdf`);
+    
     document.body.appendChild(link);
     link.click();
     link.remove();
