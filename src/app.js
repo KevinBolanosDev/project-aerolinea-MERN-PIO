@@ -10,7 +10,7 @@ const app = express();
 //Permitimos que los dominios se comuniquen entre seervidores, en este caso se conecta al frontend
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://airline-gravity.netlify.app/",
     credentials: true,
   })
 );
