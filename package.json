@@ -6,7 +6,6 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "build": "run build",
     "start": "node src/index.js"
   },
   "keywords": [],
