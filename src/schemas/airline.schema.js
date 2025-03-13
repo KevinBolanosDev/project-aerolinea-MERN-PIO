@@ -1,15 +1,21 @@
-import {z} from "zod";
+import { z } from "zod";
 
 const airlineSchema = z.object({
-  name: z.string({
-    required_error: "El nombre es obligatorio",
-  }).trim(),
-  legal_name: z.string({
-    required_error: "El nombre legal es obligatorio",
-  }).trim(),
-  country_of_origin: z.string({
-    required_error: "El país de origen es obligatorio",
-  }).trim(),
+  name: z
+    .string({
+      required_error: "El nombre es obligatorio",
+    })
+    .trim(),
+  legal_name: z
+    .string({
+      required_error: "El nombre legal es obligatorio",
+    })
+    .trim(),
+  country_of_origin: z
+    .string({
+      required_error: "El país de origen es obligatorio",
+    })
+    .trim(),
   number_of_employees: z
     .number({
       required_error: "Debe agregar un valor obligatorio",
@@ -17,9 +23,11 @@ const airlineSchema = z.object({
     })
     .int("Debe ser un número entero")
     .nonnegative("El número de empleados debe ser mayor o igual a 0"),
-  main_office: z.string({
-    required_error: "La oficina principal es obligatoria",
-  }).trim(),
+  main_office: z
+    .string({
+      required_error: "La oficina principal es obligatoria",
+    })
+    .trim(),
   phone: z
     .string({
       required_error: "El teléfono es obligatorio",
